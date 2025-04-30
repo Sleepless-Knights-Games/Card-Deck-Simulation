@@ -1,16 +1,19 @@
-import plotly.graph_objs as go
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
 
-def plot_cumulative_probability(data):
-    turns, probs = zip(*data)
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=turns, y=probs, mode='lines+markers', name='Cumulative Probability'))
-    fig.update_layout(title="Cumulative Probability", xaxis_title="Turn", yaxis_title="Probability", yaxis_range=[0,1])
+def plot_cumulative_probability(sim_result):
+    data = sim_result["draws"]
+    df = pd.DataFrame({"Draws": data})
+    plot = sns.histplot(data=df, x="Draws", stat="probability", kde=False)
+    fig = plot.get_figure()
+    fig.tight_layout()
     return fig
 
-def plot_turn_probability(data):
-    turns, cumulative = zip(*data)
-    turn_probs = [cumulative[0]] + [round(cumulative[i] - cumulative[i-1], 5) for i in range(1, len(cumulative))]
-    fig = go.Figure()
-    fig.add_trace(go.Bar(x=turns, y=turn_probs, name='Turn Probability'))
-    fig.update_layout(title="Probability of Ending on Turn", xaxis_title="Turn", yaxis_title="Probability", yaxis_range=[0, max(turn_probs) * 1.2])
+def plot_turn_probability(sim_result):
+    data = sim_result["draws"]
+    df = pd.DataFrame({"Turn": range(1, len(data)+1), "Draw": data})
+    fig, ax = plt.subplots()
+    sns.countplot(x="Draw", data=df, ax=ax)
+    ax.set_title("Draw Frequency by Card")
     return fig
