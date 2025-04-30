@@ -1,32 +1,16 @@
-import numpy as np
+import random
 
-def simulate_game(initial_events, initial_blanks, max_turns, consecutive_events_to_end, simulations=10000):
-    results = np.zeros(max_turns)
-    
-    for _ in range(simulations):
-        deck = ['E'] * initial_events + ['B'] * initial_blanks
-        revealed = []
-        turn = 0
-        consecutive = 0
+def simulate_game(deck, num_turns):
+    draws = []
+    for _ in range(num_turns):
+        draw = random.choice(deck)
+        draws.append(draw)
 
-        for t in range(max_turns):
-            if not deck:
-                break
+    cumulative_count = {}
+    for i, card in enumerate(draws, 1):
+        cumulative_count[card] = cumulative_count.get(card, 0) + 1
 
-            turn += 1
-            drawn = np.random.choice(deck)
-            deck.remove(drawn)
-
-            if drawn == 'E':
-                revealed.append('E')
-                consecutive += 1
-                if consecutive >= consecutive_events_to_end:
-                    results[turn - 1] += 1
-                    break
-            else:
-                deck += revealed
-                revealed = []
-                consecutive = 0
-
-    cumulative = np.cumsum(results) / simulations
-    return list(zip(range(1, max_turns + 1), cumulative))
+    return {
+        "draws": draws,
+        "cumulative_count": cumulative_count
+    }
