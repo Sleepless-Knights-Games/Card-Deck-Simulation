@@ -5,27 +5,26 @@ def simulate_game(initial_events, initial_blanks, max_turns, consecutive_events_
 
     for _ in range(num_simulations):
         deck = ['E'] * initial_events + ['B'] * initial_blanks
-        discard = []
+        np.random.shuffle(deck)
+
+        revealed = []
         consecutive_events = 0
         turn = 1
 
-        while turn <= max_turns:
-            if not deck:
-                # Reshuffle discard into deck if empty
-                deck = discard
-                discard = []
+        while turn <= max_turns and deck:
+            card = deck.pop(np.random.randint(len(deck)))
 
-            np.random.shuffle(deck)
-            draw = deck.pop()
-            
-            if draw == 'E':
+            if card == 'E':
+                revealed.append(card)
                 consecutive_events += 1
                 if consecutive_events >= consecutive_events_to_end:
                     results[turn] += 1
                     break
-            else:
+            else:  # Blank drawn
                 consecutive_events = 0
-                discard.append(draw)  # Discard the blank
+                # Remove blank from game, reshuffle revealed events back into deck
+                deck += revealed
+                revealed = []
 
             turn += 1
 
